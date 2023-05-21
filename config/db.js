@@ -1,9 +1,11 @@
 import { Sequelize } from "sequelize";
 
 
-const db = new Sequelize('authentication_db','root','', {
-    host: "localhost",
-    dialect: "mysql"
-});
+const db = mysql.createConnection({
+    host: 34.128.95.248,
+    user: 'root',
+    database: 'authentication_db',
+    password: 'dimas21032004'
+})
 
 export default db;
