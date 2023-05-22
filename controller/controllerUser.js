@@ -1,10 +1,11 @@
-import Users from "../models/userModel.js";
+// import Users from "../models/userModel.js";
+import db from "../config/db.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const getUsers = async (req, res) => {
     try {
-        const users = await Users.findAll({
+        const users = await db.findAll({
             attributes: ['id', 'name', 'email']
         });
         res.json(users);
@@ -21,7 +22,7 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
     try {
-        await Users.create({
+        await db.create({
             name: name,
             email: email,
             password: hashPassword
@@ -36,7 +37,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const user = await Users.findAll({
+        const user = await db.findAll({
             where:{
                 email: req.body.email
             }
@@ -54,7 +55,7 @@ export const login = async (req, res) => {
         const refreshToken = jwt.sign({ userId, name, email }, process.env.REFRESH_TOKEN_SECRET, {
             expiresIn: '1d'
         });
-        await Users.update({refresh_token: refreshToken}, {
+        await db.update({refresh_token: refreshToken}, {
             where:{
                 id: userId
             }
@@ -75,14 +76,14 @@ export const login = async (req, res) => {
 export const logOut = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
         if(!refreshToken) return res.sendStatus(204);
-        const user = await Users.findAll({
+        const user = await db.findAll({
             where:{
                 refresh_token: refreshToken
             }
         });
         if(!user[0]) return res.sendStatus(204);
         const userId = user[0].id;
-        await Users.update({ refresh_token: null }, {
+        await db.update({ refresh_token: null }, {
             where:{
                 id: userId
             }
